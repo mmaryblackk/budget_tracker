@@ -9,20 +9,28 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useStore } from "@/store/useStore";
 import { bankingMap, ILoan, TCurrency } from "@/types/interfaces";
 import { iconsMap } from "@/utils/icons";
-import { mockAccounts, mockCategories } from "@/utils/mockadata";
+import { mockCategories } from "@/utils/mockadata";
 import { formatAmount } from "@/utils/utils";
 import { Plus, Trash } from "lucide-react";
 import Image from "next/image";
+import { useEffect } from "react";
 
 interface ILoanCardProps {
   loan: ILoan;
 }
 
 export const LoanCard = ({ loan }: ILoanCardProps) => {
+  const { accounts, fetchAccounts } = useStore();
+
+  useEffect(() => {
+    fetchAccounts();
+  }, [fetchAccounts]);
+
   const category = mockCategories.find((cat) => cat.id === loan.category_id);
-  const account = mockAccounts.find((acc) => acc.id === loan.account_id);
+  const account = accounts.find((acc) => acc.id === loan.account_id);
   const Icon = iconsMap[category?.icon ?? "CircleQuestionMark"];
 
   const paidAmount = (loan.totalAmount / loan.totalPayments) * loan.monthPaid;

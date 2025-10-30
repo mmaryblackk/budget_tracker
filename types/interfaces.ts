@@ -7,6 +7,7 @@ export interface IChildrenProps {
 
 export type TCurrency = "UAH" | "USD" | "EUR";
 export type TBanking = "MONO" | "PRIVAT" | "PUMB";
+export type TTransaction = "INCOME" | "EXPENSE" | "TRANSFER";
 
 export const bankingMap: Record<TBanking, string> = {
   MONO: "/assets/icons/monobank-logo.png",
@@ -33,28 +34,8 @@ export interface IAccount {
   balance: number;
   type: "CARD" | "CASH";
   currency: TCurrency;
-  banking?: TBanking;
+  banking: TBanking | null;
   owner: string;
-}
-
-export interface ICategory {
-  id: number;
-  name: string;
-  icon: TIcons;
-  color: string;
-  type: "INCOME" | "EXPENSE" | "TRANSFER";
-}
-
-export interface ITransaction {
-  id: number;
-  account_id: number;
-  category_id?: number;
-  type: "INCOME" | "EXPENSE" | "TRANSFER";
-  commission?: number;
-  amount: number;
-  description?: string;
-  date: string;
-  currency: TCurrency;
 }
 
 export interface ILoan {
@@ -65,4 +46,24 @@ export interface ILoan {
   totalAmount: number;
   totalPayments: number;
   monthPaid: number;
+}
+
+export interface ICategory {
+  id: number;
+  name: string;
+  icon: TIcons;
+  color: string;
+  type: TTransaction;
+}
+
+export interface ITransaction {
+  id: number;
+  account_id: number;
+  category_id?: number;
+  type: TTransaction;
+  commission?: number;
+  amount: number;
+  description?: string;
+  date: string;
+  currency: TCurrency;
 }

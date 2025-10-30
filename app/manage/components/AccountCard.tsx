@@ -1,13 +1,14 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { bankingMap, currencyMap, IAccount } from "@/types/interfaces";
 import { formatString } from "@/utils/utils";
-import { Coins, CreditCard, Trash } from "lucide-react";
+import { Coins, CreditCard } from "lucide-react";
 import Image from "next/image";
+import { AccountDeleteDialog } from "./AccountDeleteDialog";
+import { AccountDialog } from "./AccountDialog";
 
 interface IAccountCardProps {
   account: IAccount;
@@ -57,7 +58,8 @@ export const AccountCard = ({ account }: IAccountCardProps) => {
           <span
             className={cn(
               "font-bold text-2xl",
-              account.balance > 0 ? "text-[#00D621]/80" : "text-[#FF2826]/80"
+              account.balance > 0 && "text-[#00D621]/80",
+              account.balance < 0 && "text-[#FF2826]/80"
             )}
           >
             {account.balance.toFixed(2)} {currencyMap[account.currency]}
@@ -65,11 +67,8 @@ export const AccountCard = ({ account }: IAccountCardProps) => {
         </div>
         <Separator className="my-1" />
         <div className="flex justify-between items-center">
-          <Button variant="outline">Edit</Button>
-          <Button variant="destructive">
-            <Trash />
-            Delete
-          </Button>
+          <AccountDialog account={account} />
+          <AccountDeleteDialog accountId={account.id} />
         </div>
       </CardContent>
     </Card>

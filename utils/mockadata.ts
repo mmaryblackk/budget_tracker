@@ -1,42 +1,4 @@
-import { IAccount, ICategory, ILoan, ITransaction } from "@/types/interfaces";
-
-export const mockAccounts: IAccount[] = [
-  {
-    id: 1,
-    name: "Mono black 5402",
-    balance: -29775.5,
-    type: "CARD",
-    currency: "UAH",
-    owner: "MARYNA",
-    banking: "MONO",
-  },
-  {
-    id: 2,
-    name: "Mono white 9831",
-    balance: 8150,
-    type: "CARD",
-    currency: "UAH",
-    owner: "MARYNA",
-    banking: "MONO",
-  },
-  {
-    id: 3,
-    name: "Cash Vanya",
-    balance: 140,
-    type: "CASH",
-    currency: "UAH",
-    owner: "IVAN",
-  },
-  {
-    id: 4,
-    name: "Pumb",
-    balance: -40173.46,
-    type: "CARD",
-    banking: "PUMB",
-    currency: "UAH",
-    owner: "IVAN",
-  },
-];
+import { ICategory, ILoan, ITransaction } from "@/types/interfaces";
 
 export const mockCategories: ICategory[] = [
   {
@@ -180,7 +142,7 @@ export const mockTransactions: ITransaction[] = [
 export const mockLoans: ILoan[] = [
   {
     id: 1,
-    account_id: 1,
+    account_id: 2,
     category_id: 2,
     name: "EcoFlow Delta 2",
     totalAmount: 28000,
@@ -189,7 +151,7 @@ export const mockLoans: ILoan[] = [
   },
   {
     id: 2,
-    account_id: 4,
+    account_id: 5,
     category_id: 5,
     name: "Laptop Acer",
     totalAmount: 30000,

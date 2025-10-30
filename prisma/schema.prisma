@@ -5,8 +5,7 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client"
-  output   = "../lib/generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -25,30 +24,46 @@ enum CurrencyType {
   USD
 }
 
+enum AccountType {
+  CASH
+  CARD
+}
+
+enum BankingType {
+  MONO
+  PRIVAT
+  PUMB
+}
+
 model Category {
-  id          Int           @id @default(autoincrement())
-  name        String        @unique
-  icon        String
-  color       String
-  type        TransactionType
-  transactions Transaction[]
+  id    Int             @id @default(autoincrement())
+  name  String          @unique
+  icon  String
+  color String
+  type  TransactionType
+  // transactions Transaction[]
 }
 
 model Account {
-  id           Int           @id @default(autoincrement())
-  name         String        @unique
-  transactions Transaction[]
+  id       Int          @id @default(autoincrement())
+  name     String       @unique
+  balance  Float
+  type     AccountType
+  currency CurrencyType
+  banking  BankingType?
+  owner    String
+  // transactions Transaction[]
 }
 
-model Transaction {
-  id          Int             @id @default(autoincrement())
-  account     Account         @relation(fields: [accountId], references: [id])
-  accountId   Int
-  type        TransactionType
-  category    Category        @relation(fields: [categoryId], references: [id])
-  categoryId  Int
-  amount      Float
-  description String?
-  createdAt   DateTime        @default(now())
-  currency    CurrencyType
-}
+// model Transaction {
+//   id          Int             @id @default(autoincrement())
+//   account     Account         @relation(fields: [accountId], references: [id])
+//   accountId   Int
+//   type        TransactionType
+//   category    Category        @relation(fields: [categoryId], references: [id])
+//   categoryId  Int
+//   amount      Float
+//   description String?
+//   createdAt   DateTime        @default(now())
+//   currency    CurrencyType
+// }
