@@ -17,9 +17,9 @@ export const addAccount = async (
 
 export const updateAccount = async (
   id: number,
-  account: Partial<IAccount>
+  account: Omit<IAccount, "id">
 ): Promise<IAccount> => {
-  const { data } = await axios.patch(`${ACCOUNT_API}/${id}`, account);
+  const { data } = await axios.put(`${ACCOUNT_API}/${id}`, account);
   return data;
 };
 

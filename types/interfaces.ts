@@ -1,4 +1,5 @@
-import { TIcons } from "@/utils/icons";
+import { TColor } from "@/utils/colors";
+import { TIcon } from "@/utils/icons";
 import { JSX, ReactNode } from "react";
 
 export interface IChildrenProps {
@@ -7,7 +8,7 @@ export interface IChildrenProps {
 
 export type TCurrency = "UAH" | "USD" | "EUR";
 export type TBanking = "MONO" | "PRIVAT" | "PUMB";
-export type TTransaction = "INCOME" | "EXPENSE" | "TRANSFER";
+export type TTransaction = "INCOME" | "EXPENSE";
 
 export const bankingMap: Record<TBanking, string> = {
   MONO: "/assets/icons/monobank-logo.png",
@@ -22,7 +23,7 @@ export const currencyMap: Record<TCurrency, string> = {
 };
 
 export interface ITotals {
-  key: "INCOME" | "EXPENSE" | "BALANCE";
+  key: TTransaction | "BALANCE";
   label: string;
   icon: () => JSX.Element;
   amount: number;
@@ -45,14 +46,15 @@ export interface ILoan {
   name: string;
   totalAmount: number;
   totalPayments: number;
-  monthPaid: number;
+  monthsPaid: number;
+  firstPaymentDate: string;
 }
 
 export interface ICategory {
   id: number;
   name: string;
-  icon: TIcons;
-  color: string;
+  icon: TIcon;
+  color: TColor;
   type: TTransaction;
 }
 
@@ -60,7 +62,7 @@ export interface ITransaction {
   id: number;
   account_id: number;
   category_id?: number;
-  type: TTransaction;
+  type: TTransaction | "TRANSFER";
   commission?: number;
   amount: number;
   description?: string;

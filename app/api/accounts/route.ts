@@ -1,9 +1,8 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { prisma } from "@/prisma/client";
 import { accountSchema } from "@/utils/schemas";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   const accounts = await prisma.account.findMany();
   return NextResponse.json(accounts);
 }

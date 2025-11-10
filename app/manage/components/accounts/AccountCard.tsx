@@ -1,20 +1,32 @@
-"use client";
-
+import {
+  ConfirmationDialog,
+  IConfirmationDialogProps,
+} from "@/components/ConfirmationDialog";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
+import { useStore } from "@/store/store";
 import { bankingMap, currencyMap, IAccount } from "@/types/interfaces";
-import { formatString } from "@/utils/utils";
-import { Coins, CreditCard } from "lucide-react";
+import { formatString } from "@/utils/formatters";
+import { Coins, CreditCard, Trash } from "lucide-react";
 import Image from "next/image";
-import { AccountDeleteDialog } from "./AccountDeleteDialog";
 import { AccountDialog } from "./AccountDialog";
+
+const CONFIRMATION_DIALOG_PROPS: IConfirmationDialogProps = {
+  title: "Are you sure you want to delete account?",
+  message: "This action can't be undone.",
+  secondaryMessage:
+    "Note! All your transactions under this account will remain.",
+};
 
 interface IAccountCardProps {
   account: IAccount;
 }
 
 export const AccountCard = ({ account }: IAccountCardProps) => {
+  const { isLoading, deleteAccount } = useStore((state) => state.accounts);
+
   return (
     <Card className="w-[300px] gap-1">
       <CardHeader>
@@ -68,7 +80,17 @@ export const AccountCard = ({ account }: IAccountCardProps) => {
         <Separator className="my-1" />
         <div className="flex justify-between items-center">
           <AccountDialog account={account} />
-          <AccountDeleteDialog accountId={account.id} />
+          <ConfirmationDialog
+            {...CONFIRMATION_DIALOG_PROPS}
+            isDeleting={true}
+            isLoading={isLoading}
+            onConfirm={async () => await deleteAccount(account.id)}
+          >
+            <Button variant="destructive">
+              <Trash />
+              Delete
+            </Button>
+          </ConfirmationDialog>
         </div>
       </CardContent>
     </Card>

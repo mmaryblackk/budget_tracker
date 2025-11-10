@@ -28,7 +28,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Spinner } from "@/components/ui/spinner";
-import { useStore } from "@/store/useStore";
+import { useStore } from "@/store/store";
 import { IAccount } from "@/types/interfaces";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus } from "lucide-react";
@@ -48,7 +48,7 @@ const accountFormSchema = z.object({
   owner: z.string().min(1, { message: "Owner is required" }),
 });
 
-export type TAccountSchemaForm = z.infer<typeof accountFormSchema>;
+export type TAccountSchemaValues = z.infer<typeof accountFormSchema>;
 
 interface IAccountDialogProps {
   account?: IAccount;
@@ -56,8 +56,10 @@ interface IAccountDialogProps {
 
 export function AccountDialog({ account }: IAccountDialogProps) {
   const [open, setOpen] = useState(false);
-  const { isLoading, addAccount, updateAccount } = useStore();
-  const accountForm = useForm<TAccountSchemaForm>({
+  const { isLoading, addAccount, updateAccount } = useStore(
+    (state) => state.accounts
+  );
+  const accountForm = useForm<TAccountSchemaValues>({
     resolver: zodResolver(accountFormSchema),
     mode: "onSubmit",
     defaultValues: {
@@ -85,13 +87,13 @@ export function AccountDialog({ account }: IAccountDialogProps) {
         balance: 0,
         type: "CASH",
         currency: "UAH",
-        banking: undefined,
+        banking: null,
         owner: "",
       });
     }
   }, [account, accountForm]);
 
-  const onSubmit = (values: TAccountSchemaForm) => {
+  const onSubmit = (values: TAccountSchemaValues) => {
     if (isNaN(Number(values.balance))) {
       accountForm.setError("balance", {
         type: "manual",
@@ -125,7 +127,15 @@ export function AccountDialog({ account }: IAccountDialogProps) {
   });
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog
+      open={open}
+      onOpenChange={(isOpen) => {
+        setOpen(isOpen);
+        if (!isOpen) {
+          accountForm.reset();
+        }
+      }}
+    >
       <DialogTrigger asChild>
         {account ? (
           <Button variant="outline">Edit</Button>
@@ -136,10 +146,7 @@ export function AccountDialog({ account }: IAccountDialogProps) {
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent
-        className="sm:max-w-[425px]"
-        onOpenAutoFocus={(e) => e.preventDefault()}
-      >
+      <DialogContent onOpenAutoFocus={(e) => e.preventDefault()}>
         <DialogHeader>
           <DialogTitle>Set Up Your Account</DialogTitle>
           <DialogDescription>
@@ -202,7 +209,7 @@ export function AccountDialog({ account }: IAccountDialogProps) {
                       placeholder="Enter amount"
                       type="number"
                       className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                      value={field.value as number}
+                      value={field.value === 0 ? "" : (field.value as string)}
                       onChange={(e) => field.onChange(e.target.value)}
                     />
                   </FormControl>
@@ -253,7 +260,7 @@ export function AccountDialog({ account }: IAccountDialogProps) {
                         onValueChange={(val) => {
                           field.onChange(val);
                           if (val === "CASH") {
-                            accountForm.resetField("banking");
+                            accountForm.setValue("banking", null);
                           }
                         }}
                       >
@@ -279,8 +286,8 @@ export function AccountDialog({ account }: IAccountDialogProps) {
                       <FormLabel>Bank</FormLabel>
                       <FormControl>
                         <Select
-                          value={field.value ?? ""}
-                          onValueChange={field.onChange}
+                          value={field.value ?? undefined}
+                          onValueChange={(val) => field.onChange(val || null)}
                         >
                           <SelectTrigger className="w-full">
                             <SelectValue placeholder="Select bank" />

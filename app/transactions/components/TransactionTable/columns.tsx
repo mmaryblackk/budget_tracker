@@ -4,33 +4,46 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { ITransaction } from "@/types/interfaces";
 import { iconsMap } from "@/utils/icons";
-import { mockCategories } from "@/utils/mockadata";
-import { formatAmount, formatDate, formatString } from "@/utils/utils";
+import { formatAmount, formatDate, formatString } from "@/utils/formatters";
 import { ColumnDef } from "@tanstack/react-table";
+import { ArrowRightLeft } from "lucide-react";
+import { useStore } from "@/store/store";
+
+function CategoryCell({ category_id }: { category_id: number }) {
+  const { categories } = useStore((state) => state.categories);
+
+  if (!category_id) {
+    return (
+      <div className="pl-2 flex items-center gap-2">
+        <ArrowRightLeft className="w-6 h-6 p-1 text-white" />
+        <span className="text-base">Transfer</span>
+      </div>
+    );
+  }
+
+  const category = categories.find((cat) => cat.id === category_id);
+  if (!category) return null;
+
+  const Icon = iconsMap[category.icon];
+
+  return (
+    <div className="pl-2 flex items-center gap-2">
+      <Icon
+        className="w-6 h-6 p-1 rounded-full text-white"
+        style={{ backgroundColor: category.color }}
+      />
+      <span className="text-base">{category.name}</span>
+    </div>
+  );
+}
 
 export const columns: ColumnDef<ITransaction>[] = [
   {
     accessorKey: "category_id",
     header: () => <div className="ml-2 text-xl font-semibold">Category</div>,
-    cell: ({ row }) => {
-      const category_id = row.getValue("category_id") as number;
-      const category = mockCategories.find((cat) => cat.id === category_id);
-      if (!category) {
-        return null;
-      }
-
-      const Icon = iconsMap[category.icon];
-
-      return (
-        <div className="pl-2 flex items-center gap-2">
-          <Icon
-            className="w-6 h-6 p-1 rounded-full text-white"
-            style={{ backgroundColor: category.color }}
-          />
-          <span className="text-base">{category.name}</span>
-        </div>
-      );
-    },
+    cell: ({ row }) => (
+      <CategoryCell category_id={row.getValue("category_id")} />
+    ),
   },
   {
     accessorKey: "date",

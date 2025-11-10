@@ -1,5 +1,4 @@
 "use client";
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -9,33 +8,35 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { useStore } from "@/store/useStore";
+import { useStore } from "@/store/store";
 import { bankingMap, ILoan, TCurrency } from "@/types/interfaces";
+import { formatAmount } from "@/utils/formatters";
 import { iconsMap } from "@/utils/icons";
-import { mockCategories } from "@/utils/mockadata";
-import { formatAmount } from "@/utils/utils";
+import { addMonths, format } from "date-fns";
 import { Plus, Trash } from "lucide-react";
 import Image from "next/image";
-import { useEffect } from "react";
 
 interface ILoanCardProps {
   loan: ILoan;
 }
 
 export const LoanCard = ({ loan }: ILoanCardProps) => {
-  const { accounts, fetchAccounts } = useStore();
+  const { accounts } = useStore((state) => state.accounts);
+  const { categories } = useStore((state) => state.categories);
 
-  useEffect(() => {
-    fetchAccounts();
-  }, [fetchAccounts]);
-
-  const category = mockCategories.find((cat) => cat.id === loan.category_id);
+  const category = categories.find((cat) => cat.id === loan.category_id);
   const account = accounts.find((acc) => acc.id === loan.account_id);
   const Icon = iconsMap[category?.icon ?? "CircleQuestionMark"];
 
-  const paidAmount = (loan.totalAmount / loan.totalPayments) * loan.monthPaid;
+  const paidAmount = (loan.totalAmount / loan.totalPayments) * loan.monthsPaid;
 
   const progress = Math.min((paidAmount / loan.totalAmount) * 100, 100);
+
+  const nextPaymentDate = (paymentDate: string, paidMonths: number) => {
+    const date = new Date(paymentDate);
+    const newDate = addMonths(date, paidMonths);
+    return format(newDate, "yyyy-MM-dd'T'HH:mm:ss");
+  };
 
   return (
     <Card className="w-[300px] gap-1">
@@ -84,7 +85,6 @@ export const LoanCard = ({ loan }: ILoanCardProps) => {
             <Progress value={progress} className="h-3 rounded-full" />
           </TooltipTrigger>
           <TooltipContent>
-            <p>{loan.totalPayments - loan.monthPaid} payments left</p>
             <p>
               {formatAmount(
                 account?.currency as TCurrency,
@@ -92,6 +92,7 @@ export const LoanCard = ({ loan }: ILoanCardProps) => {
               )}{" "}
               left
             </p>
+            <p>{loan.totalPayments - loan.monthsPaid} payments left</p>
           </TooltipContent>
         </Tooltip>
 
@@ -102,9 +103,23 @@ export const LoanCard = ({ loan }: ILoanCardProps) => {
               {formatAmount(account?.currency as TCurrency, paidAmount)}
             </span>
           </div>
+          <div className="flex justify-between">
+            <span className="text-muted-foreground">Months paid</span>
+            <span>{loan.monthsPaid}</span>
+          </div>
+        </div>
+        <Separator />
+        <div className="flex justify-between text-lg">
+          <span className="text-muted-foreground">Next Payment</span>
+          <span>
+            {format(
+              nextPaymentDate(loan.firstPaymentDate, loan.monthsPaid),
+              "dd.MM.yyyy"
+            )}
+          </span>
         </div>
 
-        <Separator className="my-1" />
+        <Separator />
 
         <div className="flex justify-between items-center">
           <Button variant="constructive">

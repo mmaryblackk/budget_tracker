@@ -12,7 +12,7 @@ export const LoansManagement = () => {
   return (
     <>
       <div className="flex justify-between items-center">
-        <h2 className="font-bold text-4xl pt-2">Your loans and debts</h2>
+        <h2 className="font-bold text-4xl pt-2">Your loans and installments</h2>
         <div className="flex gap-3">
           <Button variant="outline" size="lg" className="text-md">
             <Plus />

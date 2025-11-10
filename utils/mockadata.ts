@@ -1,42 +1,4 @@
-import { ICategory, ILoan, ITransaction } from "@/types/interfaces";
-
-export const mockCategories: ICategory[] = [
-  {
-    id: 1,
-    name: "Salary",
-    icon: "BanknoteArrowDown",
-    color: "#009140",
-    type: "INCOME",
-  },
-  {
-    id: 2,
-    name: "Home",
-    icon: "House",
-    color: "#0035AD",
-    type: "EXPENSE",
-  },
-  {
-    id: 3,
-    name: "Parents' help",
-    icon: "UsersRound",
-    color: "#6B00AD",
-    type: "INCOME",
-  },
-  {
-    id: 4,
-    name: "Food",
-    icon: "Salad",
-    color: "#E37D00",
-    type: "EXPENSE",
-  },
-  {
-    id: 5,
-    name: "Car",
-    icon: "CarFront",
-    color: "#CFC22B",
-    type: "EXPENSE",
-  },
-];
+import { ILoan, ITransaction } from "@/types/interfaces";
 
 export const mockTransactions: ITransaction[] = [
   {
@@ -147,7 +109,8 @@ export const mockLoans: ILoan[] = [
     name: "EcoFlow Delta 2",
     totalAmount: 28000,
     totalPayments: 10,
-    monthPaid: 1,
+    monthsPaid: 1,
+    firstPaymentDate: "2025-10-24T09:00:00",
   },
   {
     id: 2,
@@ -156,6 +119,7 @@ export const mockLoans: ILoan[] = [
     name: "Laptop Acer",
     totalAmount: 30000,
     totalPayments: 12,
-    monthPaid: 5,
+    monthsPaid: 2,
+    firstPaymentDate: "2025-09-09T09:00:00",
   },
 ];

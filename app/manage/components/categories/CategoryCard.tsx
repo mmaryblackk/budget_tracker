@@ -1,12 +1,26 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { ICategory } from "@/types/interfaces";
 import { iconsMap } from "@/utils/icons";
-import { PiggyBank, Plus, Trash } from "lucide-react";
+import { CategoryDialog } from "./CategoryDialog";
+import {
+  ConfirmationDialog,
+  IConfirmationDialogProps,
+} from "@/components/ConfirmationDialog";
+import { Button } from "@/components/ui/button";
+import { Trash } from "lucide-react";
+import { useStore } from "@/store/store";
+
+const CONFIRMATION_DIALOG_PROPS: IConfirmationDialogProps = {
+  title: "Are you sure you want to delete the category?",
+  message:
+    "This action cannot be undone. This will permanently delete this category.",
+  secondaryMessage:
+    "Note! All your transactions under this category will remain.",
+};
 
 interface ICategoryCardProps {
   category: ICategory;
@@ -14,6 +28,8 @@ interface ICategoryCardProps {
 
 export const CategoryCard = ({ category }: ICategoryCardProps) => {
   const Icon = iconsMap[category.icon];
+  const { isLoading, deleteCategory } = useStore((state) => state.categories);
+
   return (
     <Card
       className={cn(
@@ -36,27 +52,18 @@ export const CategoryCard = ({ category }: ICategoryCardProps) => {
 
         <Separator />
         <div className="flex justify-between items-center">
-          <Button variant="outline">Edit</Button>
-          <Button variant="outline">
-            <Trash />
-          </Button>
+          <CategoryDialog category={category} />
+          <ConfirmationDialog
+            {...CONFIRMATION_DIALOG_PROPS}
+            isDeleting={true}
+            isLoading={isLoading}
+            onConfirm={async () => await deleteCategory(category.id)}
+          >
+            <Button variant="outline">
+              <Trash />
+            </Button>
+          </ConfirmationDialog>
         </div>
-      </CardContent>
-    </Card>
-  );
-};
-
-export const EmptyCategoryCard = () => {
-  return (
-    <Card className="w-[200px] h-[227px] p-4 bg-background gap-1 justify-center border border-muted border-dashed shadow-md">
-      <CardContent className="px-2 flex flex-col items-center gap-5">
-        <PiggyBank className="w-14 h-14 text-white/80" />
-        <span className="text-sm text-center text-muted-foreground">
-          You don&apos;t have any income categories yet
-        </span>
-        <Button>
-          <Plus /> Add category
-        </Button>
       </CardContent>
     </Card>
   );

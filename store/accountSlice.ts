@@ -1,83 +1,118 @@
 import * as accountAPI from "@/services/account";
 import { IAccount } from "@/types/interfaces";
 import { StateCreator } from "zustand";
+import { StoreState } from "./store";
 
-export interface AccountSlice {
-  isLoading: boolean;
-  error: string | null;
+interface State {
   accounts: IAccount[];
   updatingId: number | null;
+  isLoading: boolean;
+  error: string;
+}
+
+interface Actions {
   fetchAccounts: () => Promise<void>;
   addAccount: (data: Omit<IAccount, "id">) => Promise<void>;
-  updateAccount: (id: number, data: Partial<IAccount>) => Promise<void>;
+  updateAccount: (id: number, data: Omit<IAccount, "id">) => Promise<void>;
   deleteAccount: (id: number) => Promise<void>;
 }
 
-export const createAccountSlice: StateCreator<AccountSlice> = (set) => ({
+const initialState: State = {
   accounts: [],
   updatingId: null,
   isLoading: true,
-  error: null,
+  error: "",
+};
 
-  fetchAccounts: async () => {
-    try {
-      const accounts = await accountAPI.getAccounts();
-      set({ accounts, isLoading: false });
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        set({ error: err.message, isLoading: false });
-      } else {
-        set({ error: "Unknown error", isLoading: false });
-      }
-    }
-  },
+export type AccountSlice = {
+  accounts: State & Actions;
+};
 
-  addAccount: async (data) => {
-    try {
-      const newAccount = await accountAPI.addAccount(data);
-      set((state) => ({
-        accounts: [...state.accounts, newAccount],
-        isLoading: false,
-      }));
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        set({ error: err.message, isLoading: false });
-      } else {
-        set({ error: "Unknown error", isLoading: false });
-      }
-    }
-  },
-  updateAccount: async (id, data) => {
-    try {
-      set({ updatingId: id });
-      const updated = await accountAPI.updateAccount(id, data);
-      set((state) => ({
-        accounts: state.accounts.map((acc) => (acc.id === id ? updated : acc)),
-        updatingId: null,
-      }));
-    } catch (err: unknown) {
-      set({ updatingId: null });
-      if (err instanceof Error) {
-        set({ error: err.message, isLoading: false });
-      } else {
-        set({ error: "Unknown error", isLoading: false });
-      }
-    }
-  },
+// TO-DO: updated isLoading logic on every func
 
-  deleteAccount: async (id) => {
-    try {
-      await accountAPI.deleteAccount(id);
-      set((state) => ({
-        accounts: state.accounts.filter((acc) => acc.id !== id),
-        isLoading: false,
-      }));
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        set({ error: err.message, isLoading: false });
-      } else {
-        set({ error: "Unknown error", isLoading: false });
+export const createAccountSlice: StateCreator<
+  StoreState,
+  [["zustand/devtools", never], ["zustand/immer", never]],
+  [],
+  AccountSlice
+> = (set) => ({
+  accounts: {
+    ...initialState,
+
+    fetchAccounts: async () => {
+      try {
+        const accounts = await accountAPI.getAccounts();
+        set((state) => {
+          state.accounts.accounts = accounts;
+          state.accounts.isLoading = false;
+        });
+      } catch (err: unknown) {
+        set((state) => {
+          state.accounts.isLoading = false;
+          state.accounts.error =
+            err instanceof Error ? err.message : "Unknown error";
+        });
       }
-    }
+    },
+
+    addAccount: async (data) => {
+      try {
+        const newAccount = await accountAPI.addAccount(data);
+        set((state) => {
+          state.accounts.accounts.push(newAccount);
+        });
+      } catch (err: unknown) {
+        set((state) => {
+          state.accounts.error =
+            err instanceof Error ? err.message : "Unknown error";
+        });
+      }
+    },
+
+    updateAccount: async (id, data) => {
+      try {
+        set((state) => {
+          state.accounts.updatingId = id;
+        });
+
+        const updated = await accountAPI.updateAccount(id, data);
+        set((state) => {
+          const index = state.accounts.accounts.findIndex(
+            (account: IAccount) => account.id === id
+          );
+          if (index !== -1) state.accounts.accounts[index] = updated;
+          state.accounts.updatingId = null;
+        });
+      } catch (err: unknown) {
+        set((state) => {
+          state.accounts.updatingId = null;
+          state.accounts.error =
+            err instanceof Error ? err.message : "Unknown error";
+        });
+      }
+    },
+
+    deleteAccount: async (id) => {
+      try {
+        set((state) => {
+          state.accounts.isLoading = true;
+        });
+
+        await accountAPI.deleteAccount(id);
+
+        set((state) => {
+          state.accounts.accounts = state.accounts.accounts.filter(
+            (account: IAccount) => account.id !== id
+          );
+          state.accounts.isLoading = false;
+        });
+      } catch (err: unknown) {
+        set((state) => {
+          state.accounts.isLoading = false;
+          state.accounts.error =
+            err instanceof Error ? err.message : "Unknown error";
+        });
+      }
+    },
   },
 });
