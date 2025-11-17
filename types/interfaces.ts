@@ -41,13 +41,13 @@ export interface IAccount {
 
 export interface ILoan {
   id: number;
-  account_id: number;
-  category_id: number;
+  accountId: number;
+  categoryId: number;
   name: string;
   totalAmount: number;
-  totalPayments: number;
-  monthsPaid: number;
+  totalMonths: number;
   firstPaymentDate: string;
+  interestRate?: number;
 }
 
 export interface ICategory {

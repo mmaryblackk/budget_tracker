@@ -42,6 +42,7 @@ model Category {
   icon  String
   color String
   type  TransactionType
+  loans Loan[]
 }
 
 model Account {
@@ -52,7 +53,21 @@ model Account {
   currency CurrencyType
   banking  BankingType?
   owner    String
+  loans    Loan[]
   // transactions Transaction[]
+}
+
+model Loan {
+  id               Int      @id @default(autoincrement())
+  accountId        Int
+  account          Account  @relation(fields: [accountId], references: [id])
+  categoryId       Int
+  category         Category @relation(fields: [categoryId], references: [id])
+  name             String
+  totalAmount      Float
+  totalMonths      Int
+  firstPaymentDate DateTime
+  interestRate     Float?
 }
 
 // model Transaction {

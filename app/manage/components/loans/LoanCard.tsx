@@ -11,8 +11,9 @@ import {
 import { useStore } from "@/store/store";
 import { bankingMap, ILoan, TCurrency } from "@/types/interfaces";
 import { formatAmount } from "@/utils/formatters";
+import { countMadePayments, nextPaymentDate } from "@/utils/helpers";
 import { iconsMap } from "@/utils/icons";
-import { addMonths, format } from "date-fns";
+import { format } from "date-fns";
 import { Plus, Trash } from "lucide-react";
 import Image from "next/image";
 
@@ -24,19 +25,16 @@ export const LoanCard = ({ loan }: ILoanCardProps) => {
   const { accounts } = useStore((state) => state.accounts);
   const { categories } = useStore((state) => state.categories);
 
-  const category = categories.find((cat) => cat.id === loan.category_id);
-  const account = accounts.find((acc) => acc.id === loan.account_id);
+  const category = categories.find((cat) => cat.id === loan.categoryId);
+  const account = accounts.find((acc) => acc.id === loan.accountId);
+
   const Icon = iconsMap[category?.icon ?? "CircleQuestionMark"];
 
-  const paidAmount = (loan.totalAmount / loan.totalPayments) * loan.monthsPaid;
+  const monthsPaid = countMadePayments(loan.firstPaymentDate);
+
+  const paidAmount = (loan.totalAmount / loan.totalMonths) * monthsPaid;
 
   const progress = Math.min((paidAmount / loan.totalAmount) * 100, 100);
-
-  const nextPaymentDate = (paymentDate: string, paidMonths: number) => {
-    const date = new Date(paymentDate);
-    const newDate = addMonths(date, paidMonths);
-    return format(newDate, "yyyy-MM-dd'T'HH:mm:ss");
-  };
 
   return (
     <Card className="w-[300px] gap-1">
@@ -52,7 +50,7 @@ export const LoanCard = ({ loan }: ILoanCardProps) => {
                 />
               </TooltipTrigger>
               <TooltipContent>
-                <p>{category?.name}</p>
+                <p>{category?.name ?? "Unknown category"}</p>
               </TooltipContent>
             </Tooltip>
             {account?.banking && (
@@ -76,7 +74,7 @@ export const LoanCard = ({ loan }: ILoanCardProps) => {
           </div>
           <div className="flex justify-between">
             <span className="text-muted-foreground">Total months</span>
-            <span>{loan.totalPayments}</span>
+            <span>{loan.totalMonths}</span>
           </div>
         </div>
 
@@ -92,7 +90,7 @@ export const LoanCard = ({ loan }: ILoanCardProps) => {
               )}{" "}
               left
             </p>
-            <p>{loan.totalPayments - loan.monthsPaid} payments left</p>
+            <p>{loan.totalMonths - monthsPaid} payments left</p>
           </TooltipContent>
         </Tooltip>
 
@@ -105,18 +103,24 @@ export const LoanCard = ({ loan }: ILoanCardProps) => {
           </div>
           <div className="flex justify-between">
             <span className="text-muted-foreground">Months paid</span>
-            <span>{loan.monthsPaid}</span>
+            <span>{monthsPaid}</span>
           </div>
         </div>
         <Separator />
-        <div className="flex justify-between text-lg">
-          <span className="text-muted-foreground">Next Payment</span>
-          <span>
-            {format(
-              nextPaymentDate(loan.firstPaymentDate, loan.monthsPaid),
-              "dd.MM.yyyy"
-            )}
-          </span>
+        <div className="flex flex-col gap-1 text-lg">
+          <div className="flex justify-between">
+            <span className="text-muted-foreground">First Payment</span>
+            <span>{format(loan.firstPaymentDate, "dd.MM.yyyy")}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-muted-foreground">Next Payment</span>
+            <span>
+              {format(
+                nextPaymentDate(loan.firstPaymentDate, monthsPaid),
+                "dd.MM.yyyy"
+              )}
+            </span>
+          </div>
         </div>
 
         <Separator />

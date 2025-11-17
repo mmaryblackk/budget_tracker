@@ -21,3 +21,16 @@ export const categorySchema = z.object({
   }),
   type: z.enum(["INCOME", "EXPENSE"], { message: "Choose type" }),
 });
+
+export const loanSchema = z.object({
+  accountId: z.number().int(),
+  categoryId: z.number().int(),
+  name: z.string().min(1, "Name is required"),
+  totalAmount: z.number().positive("Amount must be greater than 0"),
+  totalMonths: z
+    .number()
+    .int()
+    .positive("Number of months must be greater than 0"),
+  firstPaymentDate: z.coerce.date(),
+  interestRate: z.number().min(0).max(100).optional(),
+});

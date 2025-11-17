@@ -1,4 +1,4 @@
-import { ILoan, ITransaction } from "@/types/interfaces";
+import { ITransaction } from "@/types/interfaces";
 
 export const mockTransactions: ITransaction[] = [
   {
@@ -98,28 +98,5 @@ export const mockTransactions: ITransaction[] = [
     description: "Monthly salary",
     date: "2025-10-01T09:00:00",
     currency: "USD",
-  },
-];
-
-export const mockLoans: ILoan[] = [
-  {
-    id: 1,
-    account_id: 2,
-    category_id: 2,
-    name: "EcoFlow Delta 2",
-    totalAmount: 28000,
-    totalPayments: 10,
-    monthsPaid: 1,
-    firstPaymentDate: "2025-10-24T09:00:00",
-  },
-  {
-    id: 2,
-    account_id: 5,
-    category_id: 5,
-    name: "Laptop Acer",
-    totalAmount: 30000,
-    totalPayments: 12,
-    monthsPaid: 2,
-    firstPaymentDate: "2025-09-09T09:00:00",
   },
 ];

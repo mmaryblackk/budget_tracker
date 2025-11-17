@@ -1,14 +1,19 @@
+"use client";
 import { Button } from "@/components/ui/button";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { mockLoans } from "@/utils/mockadata";
 import { Archive, Plus } from "lucide-react";
 import { LoanCard } from "./LoanCard";
+import { useStore } from "@/store/store";
+import { LoanCardSkeleton } from "./LoanCardSkeleton";
+import { EmptyAccountCard } from "../accounts/EmptyAccountCard";
 
 export const LoansManagement = () => {
+  const { loans, isLoading } = useStore((state) => state.loans);
+
   return (
     <>
       <div className="flex justify-between items-center">
@@ -31,9 +36,22 @@ export const LoansManagement = () => {
         </div>
       </div>
       <div className="flex flex-wrap gap-6">
-        {mockLoans.map((loan) => (
-          <LoanCard key={loan.id} loan={loan} />
-        ))}
+        {isLoading ? (
+          Array.from({ length: 2 }).map((_, index) => (
+            <LoanCardSkeleton key={index} />
+          ))
+        ) : loans.length === 0 ? (
+          // ADD LOAN EMPTY CARD
+          <EmptyAccountCard />
+        ) : (
+          loans.map((loan) =>
+            loan.id === 0 ? (
+              <LoanCardSkeleton key={loan.id} />
+            ) : (
+              <LoanCard key={loan.id} loan={loan} />
+            )
+          )
+        )}
       </div>
     </>
   );

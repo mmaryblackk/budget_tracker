@@ -9,10 +9,15 @@ import { useStore } from "@/store/store";
 function ManagePage() {
   const { fetchAccounts } = useStore((state) => state.accounts);
   const { fetchCategories } = useStore((state) => state.categories);
+  const { fetchLoans } = useStore((state) => state.loans);
 
   useEffect(() => {
     fetchCategories();
   }, [fetchCategories]);
+
+  useEffect(() => {
+    fetchLoans();
+  }, [fetchLoans]);
 
   useEffect(() => {
     fetchAccounts();
